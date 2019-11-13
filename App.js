@@ -11,6 +11,7 @@ import {
 import { RNCamera} from 'react-native-camera'
 import { LogLevel, RNFFmpeg } from 'react-native-ffmpeg';
 import CameraRoll from "@react-native-community/cameraroll"
+var RNFS = require('react-native-fs');
 
 
 export default class App extends Component{
@@ -37,19 +38,18 @@ export default class App extends Component{
 
   textOnImage =(uri)=>{
     RNFFmpeg.setFontDirectory('/system/fonts/DroidSansMono.ttf', null);
-    RNFFmpeg.execute(`-y -i ${uri} -filter_complex "[0:v]drawtext=fontfile='/system/fonts/DroidSansMono.ttf':text='SportVot RnD':fontsize=64:fontcolor=white" file:///data/user/0/com.videooverlay/cache/Camera/test.mp4`).then((results)=>{console.log(results)})
-    CameraRoll.saveToCameraRoll('file:///data/user/0/com.videooverlay/cache/Camera/test.mp4')
+    RNFFmpeg.execute(`-y -i ${uri} -filter_complex "[0:v]drawtext=fontfile='/system/fonts/DroidSansMono.ttf':text='SportVot RnD':fontsize=64:fontcolor=white" file:///data/user/0/com.videooverlay/cache/Camera/test.mp4`).then((results)=>{
+      console.log(results)
+      CameraRoll.saveToCameraRoll('file:///data/user/0/com.videooverlay/cache/Camera/test.mp4')
+  })
   }
 
   startRecording = async()=>{
     this.setState({recording:true})
-    options = {quality: RNCamera.Constants.VideoQuality['720p']}
-    await this.camera.recordAsync(options).then((videoDetails)=>{
+    await this.camera.recordAsync({quality: RNCamera.Constants.VideoQuality['720p'], maxDuration: 5}).then((videoDetails)=>{
       console.log('finished')
        console.log(videoDetails, 'video uri')
        this.textOnImage(videoDetails.uri)
-       CameraRoll.saveToCameraRoll(videoDetails.uri)
-
     })
   }
 
