@@ -35,11 +35,19 @@ export default class App extends Component{
       }
   }
 
+  textOnImage =(uri)=>{
+    RNFFmpeg.setFontDirectory('/system/fonts/DroidSansMono.ttf', null);
+    RNFFmpeg.execute(`-y -i ${uri} -filter_complex "[0:v]drawtext=fontfile='/system/fonts/DroidSansMono.ttf':text='SportVot RnD':fontsize=64:fontcolor=white" file:///data/user/0/com.videooverlay/cache/Camera/test.mp4`).then((results)=>{console.log(results)})
+    CameraRoll.saveToCameraRoll('file:///data/user/0/com.videooverlay/cache/Camera/test.mp4')
+  }
+
   startRecording = async()=>{
     this.setState({recording:true})
-    await this.camera.recordAsync().then((videoDetails)=>{
+    options = {quality: RNCamera.Constants.VideoQuality['720p']}
+    await this.camera.recordAsync(options).then((videoDetails)=>{
       console.log('finished')
-       console.log(videoDetails.uri, 'video uri')
+       console.log(videoDetails, 'video uri')
+       this.textOnImage(videoDetails.uri)
        CameraRoll.saveToCameraRoll(videoDetails.uri)
 
     })
